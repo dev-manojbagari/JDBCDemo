@@ -1,8 +1,5 @@
 package com.database;
 
-import java.sql.SQLException;
-
-import com.database.beans.Admin;
 import com.database.tables.AdminManager;
 import com.database.util.InputHelper;
 
@@ -12,22 +9,12 @@ public class Main {
 
 		AdminManager.displayAllRows();
 
-		int adminId = InputHelper.getIntegerInput("Select a row to update: ");
+		int adminId = InputHelper.getIntegerInput("Select a row to delete: ");
 
-		Admin bean = AdminManager.getRow(adminId);
-		if (bean == null) {
-			System.err.println("Row not found");
-			return;
-		}
-		
-		String password = InputHelper.getInput("Enter new password: ");
-		bean.setPassword(password);
-		
-		if (AdminManager.update(bean)) {
+		if (AdminManager.delete(adminId)) {
 			System.out.println("Success!");
-		} else
-		{
-			System.err.println("whoops!");
+		} else {
+			System.err.println("Nothing to delete!");
 		}
 		
 	}
