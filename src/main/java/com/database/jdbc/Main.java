@@ -1,52 +1,33 @@
 package com.database.jdbc;
 
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.Statement;
 
 import com.database.tables.Tours;
-import com.database.util.InputHelper;
 
 
 public class Main {
 
-	private static final String SQL = "{call GetToursWithCountByPrice(?, ?)}";
+	public static void main(String[] args) throws SQLException {
 
-	public static void main(String[] args) throws Exception {
-
-		double maxPrice;
-		try {
-			maxPrice = InputHelper.getDoubleInput("Enter a maximum price: ");
-		} catch (NumberFormatException e) {
-			System.err.println("Error: invalid number");
-			return;
-		}
-		
-		ResultSet rs = null;
 		try (
 				Connection conn = DBUtil.getConnection(DBType.MYSQL);
-				CallableStatement stmt = conn.prepareCall(
-						SQL,
-						ResultSet.TYPE_SCROLL_INSENSITIVE, 
-						ResultSet.CONCUR_READ_ONLY);
+				Statement stmt = conn.createStatement();
+				ResultSet rs = stmt.executeQuery("SELECT * FROM tours");
 				) {
-			stmt.setDouble(1, maxPrice);
-			stmt.registerOutParameter("total", Types.INTEGER);
-			rs = stmt.executeQuery();
 			
-			int nRows = stmt.getInt("total");
-			
-			Tours.displayData(rs, nRows);
+			Tours.displayData(rs);
 
 		} catch (SQLException e) {
+			DBUtil.processException(e);
+		} catch (Exception e) {
 			System.err.println(e);
 		}
-		finally {
-			if (rs != null) rs.close();
-		}
+
 	}
 
 }
+
 
