@@ -1,5 +1,6 @@
 package com.database.jdbc;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,8 +13,7 @@ import com.database.util.InputHelper;
 
 public class Main {
 
-	private static final String SQL = 
-			"SELECT tourId, tourName, price FROM tours WHERE price <= ?";
+	private static final String SQL = "{call GetToursByPrice(?)}";
 
 	public static void main(String[] args) throws Exception {
 
@@ -28,12 +28,12 @@ public class Main {
 		ResultSet rs = null;
 		try (
 				Connection conn = DBUtil.getConnection(DBType.MYSQL);
-				PreparedStatement stmt = conn.prepareStatement(
+				CallableStatement stmt = conn.prepareCall(// use callable stmt and also provide sql here instead of excute query method
 						SQL,
 						ResultSet.TYPE_SCROLL_INSENSITIVE, 
 						ResultSet.CONCUR_READ_ONLY);
 				) {
-			stmt.setDouble(1, maxPrice); 
+			stmt.setDouble(1, maxPrice);
 			rs = stmt.executeQuery();
 			Tours.displayData(rs);
 
