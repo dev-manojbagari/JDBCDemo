@@ -10,11 +10,10 @@ public class Main {
 	private static final String USERNAME = "dbuser";
 	private static final String PASSWORD = "dbpassword";
 	private static final String CONN_STRING =
-			"jdbc:mysql://localhost/dbname";  // 
+			"jdbc:hsqldb:data/explorecalifornia"; // for in memory db no // required
 	
 	public static void main(String[] args) throws SQLException {
 		
-		//Class.forName("com.mysql.jdbc.Driver");// not needed after jdbc 4.0
 		
 		Connection conn = null;
 		
@@ -32,3 +31,4 @@ public class Main {
 	}
 
 }
+
