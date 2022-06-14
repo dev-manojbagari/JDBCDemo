@@ -8,6 +8,10 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 
+		System.out.println("Starting application");
+		
+		ConnectionManager.getInstance().setDBType(DBType.MYSQL);
+		
 		AdminManager.displayAllRows();
 
 		int adminId = InputHelper.getIntegerInput("Select a row to update: ");
@@ -28,5 +32,6 @@ public class Main {
 			System.err.println("whoops!");
 		}
 		
+		ConnectionManager.getInstance().close();
 	}
 }
