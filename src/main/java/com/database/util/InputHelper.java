@@ -20,9 +20,14 @@ public class InputHelper {
 	}
 
 	public static double getDoubleInput(String prompt) throws NumberFormatException {
-
 		String input = getInput(prompt);
 		return Double.parseDouble(input);
 
 	}
+
+	public static int getIntegerInput(String prompt) throws NumberFormatException {
+		String input = getInput(prompt);
+		return Integer.parseInt(input);	
+	}
+	
 }
