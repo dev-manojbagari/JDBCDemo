@@ -102,20 +102,26 @@ public class AdminManager {
 	public static boolean update(Admin bean) throws Exception {
 
 		String sql =
-				"UPDATE admin SET " +
-				"userName = ?, password = ? " +
-				"WHERE adminId = ?";
+				"SELECT * FROM admin WHERE adminId = ?";
+		
+		ResultSet rs = null;
 		try (
 				Connection conn = DBUtil.getConnection(DBType.MYSQL);
-				PreparedStatement stmt = conn.prepareStatement(sql);
+				PreparedStatement stmt = conn.prepareStatement(
+						sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.CONCUR_UPDATABLE);
 				){
 			
-			stmt.setString(1, bean.getUserName());
-			stmt.setString(2, bean.getPassword());
-			stmt.setInt(3, bean.getAdminId());
+//			stmt.setString(1, bean.getUserName());
+//			stmt.setString(2, bean.getPassword());
+			stmt.setInt(1, bean.getAdminId());
 			
-			int affected = stmt.executeUpdate();
-			if (affected == 1) {
+			rs = stmt.executeQuery();
+
+			if (rs.next()) {
+				rs.updateString("userName", bean.getUserName());
+				rs.updateString("password", bean.getPassword());
+				rs.updateRow();
 				return true;
 			} else {
 				return false;
@@ -125,6 +131,8 @@ public class AdminManager {
 		catch(SQLException e) {
 			System.err.println(e);
 			return false;
+		} finally {
+			if (rs != null) rs.close();
 		}
 
 	}
