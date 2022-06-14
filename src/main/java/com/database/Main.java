@@ -1,50 +1,35 @@
 package com.database;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 
-import com.database.beans.Admin;
-import com.database.tables.AdminManager;
-import com.database.util.InputHelper;
 
 public class Main {
 
 	public static void main(String[] args) throws Exception {
 
-		System.out.println("Starting application");
-		
-		ConnectionManager.getInstance().setDBType(DBType.MYSQL);
-		
-		AdminManager.displayAllRows();
-
-		int adminId=0;
-		try {
-			adminId = InputHelper.getIntegerInput("Select a row to update: ");
-		} catch (NumberFormatException e) {
-			System.err.println("Invalid entry");
-		}
-
-		Admin bean = AdminManager.getRow(adminId);
-		if (bean == null) {
-			System.err.println("Row not found");
-			return;
-		}
-		
-		String password = InputHelper.getInput("Enter new password: ");
-		bean.setPassword(password);
-		
 		Connection conn = ConnectionManager.getInstance().getConnection();
-		conn.setAutoCommit(false);
+		ResultSet rsTables = null;
 		
-		if (AdminManager.update(bean)) {
-			System.out.println("Success!");
-		} else
-		{
-			System.err.println("whoops!");
+		try  {
+			
+			DatabaseMetaData metadata = conn.getMetaData();
+			String[] tableTypes = {"TABLE"};
+			rsTables = metadata.getTables(null, "%", "%", tableTypes);
+			while (rsTables.next()) {
+				System.out.println(rsTables.getString("TABLE_NAME"));
+			}
+
+		} catch (Exception e) {
+			System.err.println(e);
 		}
-		
-		conn.rollback();
-		System.out.println("Transaction rolled back");
+		finally {
+			rsTables.close();
+		}
 		
 		ConnectionManager.getInstance().close();
+		
 	}
+
 }
