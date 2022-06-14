@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import com.database.db.tables.Tours;
+
+
 public class Main {
 
 	private static final String USERNAME = "dbuser";
@@ -18,8 +21,7 @@ public class Main {
 				Statement stmt = conn.createStatement();
 				ResultSet rs = stmt.executeQuery("SELECT coutn(*) FROM states");) {
 
-			rs.next();
-			System.out.println("Number of rows: " + rs.getRow());
+			Tours.displayData(rs);
 
 		} catch (SQLException e) {
 			DBUtil.processException(e);
