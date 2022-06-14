@@ -1,31 +1,42 @@
 package com.database.jdbc;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.database.db.tables.Tours;
+import com.database.db.tables.States;
 
 
 public class Main {
 
-	private static final String USERNAME = "dbuser";
-	private static final String PASSWORD = "dbpassword";
-	private static final String CONN_STRING = "jdbc:hsqldb:data/explorecalifornia";
+	public static void main(String[] args) throws Exception {
 
-	public static void main(String[] args) throws SQLException {
+		try (Connection conn = DBUtil.getConnection(DBType.HSQLDB);
+				Statement stmt = conn.createStatement(
+						ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				ResultSet rs = stmt.executeQuery(
+						"SELECT stateId, stateName FROM states");   	
+				) {
 
-		try (   Connection conn = DriverManager.getConnection(CONN_STRING, USERNAME, PASSWORD);
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery("SELECT coutn(*) FROM states");) {
+			States.displayData(rs);
 
-			Tours.displayData(rs);
+			rs.last();
+			System.out.println("Number of rows: " + rs.getRow());
+
+			rs.first();
+			System.out.println("The first state is " + rs.getString("stateName"));
+
+			rs.last();
+			System.out.println("The last state is " + rs.getString("stateName"));
+
+			rs.absolute(10);
+			System.out.println("The 10th state is " + rs.getString("stateName"));
+
 
 		} catch (SQLException e) {
-			DBUtil.processException(e);
+			System.err.println(e);
 		}
-
 	}
+
 }
