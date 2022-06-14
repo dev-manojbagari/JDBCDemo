@@ -1,30 +1,49 @@
 package com.database.jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import com.database.db.tables.Tours;
+import com.database.tables.Tours;
+import com.database.util.InputHelper;
 
 
 public class Main {
 
+	private static final String SQL = 
+			"SELECT tourId, tourName, price FROM tours WHERE price <= ?";
+
 	public static void main(String[] args) throws Exception {
 
-//		ResultSet rs = null;
+		double maxPrice;
+		try {
+			maxPrice = InputHelper.getDoubleInput("Enter a maximum price: ");
+		} catch (NumberFormatException e) {
+			System.err.println("Error: invalid number");
+			return;
+		}
+		
+		ResultSet rs = null;
 		try (
-				Connection conn = DBUtil.getConnection(DBType.HSQLDB);
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(
-						"SELECT tourId, tourName, price FROM tours " +
-						"LIMIT 5, 5");
+				Connection conn = DBUtil.getConnection(DBType.MYSQL);
+				PreparedStatement stmt = conn.prepareStatement(
+						SQL,
+						ResultSet.TYPE_SCROLL_INSENSITIVE, 
+						ResultSet.CONCUR_READ_ONLY);
 				) {
-//			stmt.setMaxRows(5); // this is not ideal use limit clause in sql instead , as this fetches all rows and shows first five
+			stmt.setDouble(1, maxPrice); 
+			rs = stmt.executeQuery();
 			Tours.displayData(rs);
+
 		} catch (SQLException e) {
 			System.err.println(e);
-		} 
+		}
+		finally {
+			if (rs != null) rs.close();
+		}
 	}
+
 }
 
